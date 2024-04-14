@@ -1,10 +1,11 @@
-@startuml Sever Class Diagram
+@startuml Class Diagram
 
 class Server {
     - int serverSocket
-    - vector<Client*> clients
+    - vector<ClientHandler*> clientHandlers
     - int port
     - sockaddr_in addr
+    - mutex clientsMutex
 
     + Server(int port)
     + ~Server()
@@ -12,6 +13,8 @@ class Server {
     + void acceptConnections()
     + void broadcastMessage(string message)
     + void run()
+    + void addClient(ClientHandler* handler)
+    + void removeClient(ClientHandler* handler)
 
     - void setupAddress()
     - bool createSocket()
@@ -24,11 +27,28 @@ class Client {
     - string username
 
     + Client(int socket, string username)
-    + void receiveMessage()
+    + string receiveMessage()
     + void sendMessage(string message)
     - void sendResponse(const char* message)
 }
 
-Server "1" *-- "many" Client : contains
+class ClientHandler {
+    - Client* client
+    - Server* server
+    - thread thread
+    - atomic<bool> active
+
+    + ClientHandler(Client* client, Server* server)
+    + ~ClientHandler()
+    + void start()
+    + void run()
+    + void stop()
+    + Client* getClient()
+
+    - void processMessages()
+}
+
+Server "1" *-- "many" ClientHandler : manages
+ClientHandler "1" -- "1" Client : uses
 
 @enduml
