@@ -27,3 +27,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Find and link pthread library for the server executable
 find_package(Threads REQUIRED)
 target_link_libraries(server Threads::Threads)
+
+# Find FLTK and link it
+find_package(FLTK REQUIRED)
+include_directories(${FLTK_INCLUDE_DIR})
+target_link_libraries(test_client ${FLTK_LIBRARIES})
