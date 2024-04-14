@@ -1,18 +1,32 @@
-@startuml Server
+@startuml Sever Class Diagram
 
 class Server {
     - int serverSocket
     - vector<Client*> clients
+    - int port
+    - sockaddr_in addr
+
+    + Server(int port)
+    + ~Server()
     + void start()
     + void acceptConnections()
-    + void broadcastMessage(string)
+    + void broadcastMessage(string message)
+    + void run()
+
+    - void setupAddress()
+    - bool createSocket()
+    - bool bindSocket()
+    - void listenAndAccept()
 }
 
 class Client {
     - int socket
     - string username
+
+    + Client(int socket, string username)
     + void receiveMessage()
-    + void sendMessage(string)
+    + void sendMessage(string message)
+    - void sendResponse(const char* message)
 }
 
 Server "1" *-- "many" Client : contains
