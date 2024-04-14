@@ -4,7 +4,7 @@
 
 class Client {
 public:
-    Client(int socket, std::string username);
+    Client(int socket, const std::string& username);
     std::string receiveMessage();
     void sendMessage(const std::string& message);
 
@@ -12,5 +12,5 @@ private:
     int socket;
     std::string username;
 
-    void sendResponse(const char* message);
+    void sendResponse(const std::string& message);
 };
