@@ -13,6 +13,7 @@ include_directories("${CMAKE_SOURCE_DIR}/lib")
 add_executable(TCPServer main.cpp
     src/Server.cpp
     src/ClientHandler.cpp
+    src/Client.cpp
     ${HEADER_FILES})
 
 # Specify C++ standard

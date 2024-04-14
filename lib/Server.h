@@ -9,6 +9,8 @@
 #include "string"
 #include "ClientHandler.h"
 
+class ClientHandler;
+
 class Server {
 public:
     Server(int port);

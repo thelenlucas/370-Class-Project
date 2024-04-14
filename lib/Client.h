@@ -12,5 +12,5 @@ private:
     int socket;
     std::string username;
 
-    void sendResponse(const std::string& message);
+    void sendResponse(const char* message);
 };

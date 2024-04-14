@@ -52,3 +52,10 @@ void ClientHandler::run() {
 void ClientHandler::stop() {
     active = false;
 };
+
+// Gets the client for the handler
+// Returns:
+//    the client
+Client* ClientHandler::getClient() {
+    return client;
+};
