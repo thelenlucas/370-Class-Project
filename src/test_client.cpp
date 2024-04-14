@@ -40,6 +40,18 @@ void send_message(Fl_Widget*, void*) {
     }
 }
 
+void close_connection() {
+    if (sock != 0) {
+        close(sock);  // Close the socket properly
+        sock = 0;     // Reset the socket descriptor
+    }
+}
+
+void window_callback(Fl_Widget *w, void *) {
+    close_connection();
+    w->hide();  // Or Fl::exit(); to close the application
+}
+
 int main(int argc, char **argv) {
     // Create and open the socket
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -65,6 +77,8 @@ int main(int argc, char **argv) {
     textDisplay->buffer(textBuffer);
     input = new Fl_Input(20, 380, 600, 25);
     input->callback(send_message);
+
+    window->callback(window_callback);  // Set the callback for closing the window
 
     window->end();
     window->show(argc, argv);
