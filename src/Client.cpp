@@ -15,12 +15,14 @@ Client::Client(int socket, const std::string& username)
 // Receives a message from the client
 // Returns:
 //   the message received
-std::string Client::receiveMessage() {
+// Parameters:
+//   len - the length of the message received, passed by reference
+std::string Client::receiveMessage(int &len) {
     std::cout << "Client: Receiving message" << std::endl;
     char buffer[1024];
     std::memset(buffer, 0, sizeof(buffer));
 
-    int len = read(socket, buffer, sizeof(buffer));
+    len = read(socket, buffer, sizeof(buffer));
     if (len < 0) {
         std::cerr << "Client: Socket read failed" << std::endl;
         return "";

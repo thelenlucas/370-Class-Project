@@ -39,13 +39,21 @@ void ClientHandler::run() {
     while (active) {
         try {
             std::cout << "Client Handler: Receiving message" << std::endl;
-            std::string message = client->receiveMessage();
-            std::cout << "Client Handler: Message received" << std::endl;
-            if (!message.empty()) {
-                std::cout << "Client Handler: Broadcasting message" << std::endl;
+            int receivedLength;
+            std::string message = client->receiveMessage(receivedLength);
+            
+            if (receivedLength > 0) {
+                std::cout << "Client Handler: Message received: " << message << std::endl;
+                // Broadcast the message to all clients
                 server->broadcastMessage(message);
-                std::cout << "Client Handler: Message broadcasted" << std::endl;
+            } else if (receivedLength == 0) {
+                std::cout << "Client Handler: Client disconnected" << std::endl;
+                break;
+            } else {
+                std::cerr << "Client Handler: Error receiving message" << std::endl;
+                break;
             }
+
         } catch (const std::exception& e) {
             std::cerr << "Error: " << e.what() << std::endl;
             break;

@@ -5,7 +5,7 @@
 class Client {
 public:
     Client(int socket, const std::string& username);
-    std::string receiveMessage();
+    std::string receiveMessage(int &len);
     void sendMessage(const std::string& message);
 
 private:
