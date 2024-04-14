@@ -136,11 +136,12 @@ void Server::addClient(ClientHandler* handler) {
 // Removes a client handler from the server's list of clients
 // Parameters:
 //    handler - the client handler to remove
+// Usage from Server
 void Server::removeClient(ClientHandler* handler) {
     std::lock_guard<std::mutex> guard(clientsMutex);
     auto it = std::find(clientHandlers.begin(), clientHandlers.end(), handler);
     if (it != clientHandlers.end()) {
-        clientHandlers.erase(it);  // Correct usage of erase with an iterator
-        delete handler;
+        delete *it;
+        clientHandlers.erase(it);  
     }
 }

@@ -17,11 +17,14 @@ ClientHandler::ClientHandler(Client* client, Server* server)
 // Mainly ensures the thread is stopped
 ClientHandler::~ClientHandler() {
     std::cout << "Client Handler: Client handler destroying" << std::endl;
-    stop();
     if (thread.joinable()) {
-        thread.join();
+        if (std::this_thread::get_id() != thread.get_id()) {
+            thread.join();  // Only join if not called from the same thread
+        } else {
+            thread.detach();  // Otherwise, detach the thread
+        }
     }
-};
+}
 
 // Starts the client handler in a new thread
 void ClientHandler::start() {
