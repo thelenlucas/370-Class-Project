@@ -21,7 +21,7 @@ std::string Client::receiveMessage() {
 
     int len = read(socket, buffer, sizeof(buffer));
     if (len < 0) {
-        std::cerr << "Failed to read from socket" << std::endl;
+        std::cerr << "Client: Socket read failed" << std::endl;
         return "";
     }
 
