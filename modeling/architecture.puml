@@ -1,0 +1,13 @@
+@startuml Architecture
+
+package "Chat Server" {
+    [Server Socket] --> [Client Handler]
+    [Client Handler] --> [Message Broadcast]
+    [Message Broadcast] ..> [Client Handler] : forwards messages to all
+    [Client List] ..> [Client Handler] : tracks connected clients
+}
+
+[Client] --> [Server Socket] : connects
+[Client] --> [Client Handler] : sends/receives messages
+
+@enduml

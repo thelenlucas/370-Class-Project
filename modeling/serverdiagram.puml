@@ -1,0 +1,20 @@
+@startuml Server
+
+class Server {
+    - int serverSocket
+    - vector<Client*> clients
+    + void start()
+    + void acceptConnections()
+    + void broadcastMessage(string)
+}
+
+class Client {
+    - int socket
+    - string username
+    + void receiveMessage()
+    + void sendMessage(string)
+}
+
+Server "1" *-- "many" Client : contains
+
+@enduml
