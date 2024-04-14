@@ -16,9 +16,7 @@ public:
     Server(int port);
     ~Server();
     void start();
-    void acceptConnections();
     void broadcastMessage(const std::string& message);
-    void run();
     void removeClient(ClientHandler* handler);
 
 private:
