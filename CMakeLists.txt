@@ -10,7 +10,7 @@ file(GLOB_RECURSE HEADER_FILES "${CMAKE_SOURCE_DIR}/lib/*.h")
 include_directories("${CMAKE_SOURCE_DIR}/lib")
 
 # Add executable
-add_executable(TCPServer main.cpp src/Server.cpp src/ConnectionHandler.cpp ${HEADER_FILES})
+add_executable(TCPServer main.cpp ${HEADER_FILES})
 
 # Specify C++ standard
 set(CMAKE_CXX_STANDARD 11)
