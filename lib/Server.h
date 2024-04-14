@@ -17,6 +17,7 @@ public:
     void acceptConnections();
     void broadcastMessage(const std::string& message);
     void run();
+    void removeClient(ClientHandler* handler);
 
 private:
     int serverSocket;
@@ -30,5 +31,4 @@ private:
     bool bindSocket();
     void listenAndAccept();
     void addClient(ClientHandler* handler);
-    void removeClient(ClientHandler* handler);
 };
