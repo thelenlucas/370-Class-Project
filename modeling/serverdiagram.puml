@@ -24,7 +24,7 @@ class Client {
     - string username
 
     + Client(int socket, string username)
-    + void receiveMessage()
+    + string receiveMessage()
     + void sendMessage(string message)
     - void sendResponse(const char* message)
 }
