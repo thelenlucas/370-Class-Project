@@ -11,6 +11,9 @@
 #include <thread>
 #include <atomic>
 
+class Server;
+class Client;
+
 class ClientHandler {
 public:
     explicit ClientHandler(Client* client, Server* server);
@@ -18,6 +21,8 @@ public:
     void start();
     void run();
     void stop();
+    Client* getClient();
+    void erase();
 
 private:
     Client* client;

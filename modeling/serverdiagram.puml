@@ -43,6 +43,7 @@ class ClientHandler {
     + void start()
     + void run()
     + void stop()
+    + Client* getClient()
 
     - void processMessages()
 }
