@@ -5,6 +5,7 @@
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Input.H>
+#include <FL/Fl_Button.H>
 #include <string>
 #include <arpa/inet.h>
 #include <string>
@@ -18,7 +19,16 @@ public:
 
     void run(); // Starts the FLTK main loop
 
+void showLoginWindow();  // Show login window for username setup
+
 private:
+    Fl_Window* loginWindow;
+    Fl_Input* usernameInput;
+    Fl_Button* loginButton;
+
+    std::string username;  // Store the username
+
+    static void login_cb(Fl_Widget*, void* userdata);  // Callback for login button
     Fl_Window* window;
     Fl_Text_Display* textDisplay;
     Fl_Text_Buffer* textBuffer;

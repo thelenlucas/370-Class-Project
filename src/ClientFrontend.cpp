@@ -6,9 +6,7 @@
 #include <unistd.h>
 #include <cstring>
 
-ClientFrontend::ClientFrontend(int port, const std::string& host) : running(true) {
-    connectToServer(port, host);
-
+ClientFrontend::ClientFrontend(int port, const std::string& host) : running(false) {  // Delay running
     window = new Fl_Window(640, 480, "Chat Client");
     textDisplay = new Fl_Text_Display(20, 20, 600, 350);
     textBuffer = new Fl_Text_Buffer();
@@ -16,10 +14,9 @@ ClientFrontend::ClientFrontend(int port, const std::string& host) : running(true
     input = new Fl_Input(20, 380, 600, 25);
     input->callback(send_message, this);
 
-    window->callback(window_callback, this);
-    window->end();
+    window->end();  // Setup main chat window but don't show it yet
 
-    listenThread = std::thread(&ClientFrontend::listenForMessages, this);
+    showLoginWindow();  // First, show the login window
 }
 
 ClientFrontend::~ClientFrontend() {
@@ -32,6 +29,26 @@ ClientFrontend::~ClientFrontend() {
     delete textDisplay;
     delete textBuffer;
     delete input;
+}
+
+void ClientFrontend::showLoginWindow() {
+    loginWindow = new Fl_Window(300, 120, "Login");
+    usernameInput = new Fl_Input(70, 30, 210, 30, "Username:");
+    loginButton = new Fl_Button(110, 80, 80, 30, "Login");
+    loginButton->callback(login_cb, this);
+
+    loginWindow->end();
+    loginWindow->show();
+}
+
+void ClientFrontend::login_cb(Fl_Widget*, void* userdata) {
+    ClientFrontend* frontend = static_cast<ClientFrontend*>(userdata);
+    frontend->username = frontend->usernameInput->value();
+    frontend->connectToServer(8080, "127.0.0.1");  // Assuming these are not changing
+    frontend->window->show();
+    frontend->loginWindow->hide();
+    frontend->running = true;
+    frontend->listenThread = std::thread(&ClientFrontend::listenForMessages, frontend);
 }
 
 void ClientFrontend::run() {
@@ -102,8 +119,8 @@ void ClientFrontend::listenForMessages() {
 
 void ClientFrontend::send_message(Fl_Widget*, void* userdata) {
     ClientFrontend* frontend = static_cast<ClientFrontend*>(userdata);
-    const char* text = frontend->input->value();
-    if (send(frontend->sock, text, strlen(text), 0) < 0) {
+    std::string message = frontend->username + ": " + frontend->input->value();
+    if (send(frontend->sock, message.c_str(), message.length(), 0) < 0) {
         std::cerr << "Failed to send message" << std::endl;
     }
     frontend->input->value("");
