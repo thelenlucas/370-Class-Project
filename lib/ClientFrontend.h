@@ -14,7 +14,7 @@
 
 class ClientFrontend {
 public:
-    ClientFrontend(int port, const std::string& host);
+    ClientFrontend();
     ~ClientFrontend();
 
     void run(); // Starts the FLTK main loop
@@ -38,6 +38,7 @@ private:
     Fl_Input* serverAddressInput;
 
     int sock;
+    static const int port = 8081;
     struct sockaddr_in serv_addr;
     std::thread listenThread;
     std::atomic<bool> running;
