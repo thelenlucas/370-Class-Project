@@ -39,9 +39,24 @@ void ClientFrontend::run() {
     Fl::run();
 }
 
+#include <fcntl.h> // For fcntl
+#include <errno.h> // For errno
+
 void ClientFrontend::connectToServer(int port, const std::string& host) {
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         std::cerr << "Socket creation error" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    // Set the socket to non-blocking
+    int flags = fcntl(sock, F_GETFL, 0);
+    if (flags == -1) {
+        std::cerr << "Failed to get socket flags" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    flags |= O_NONBLOCK;
+    if (fcntl(sock, F_SETFL, flags) == -1) {
+        std::cerr << "Failed to set socket to non-blocking" << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -53,8 +68,10 @@ void ClientFrontend::connectToServer(int port, const std::string& host) {
     }
 
     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-        std::cerr << "Connection Failed" << std::endl;
-        exit(EXIT_FAILURE);
+        if (errno != EINPROGRESS) {
+            std::cerr << "Connection Failed" << std::endl;
+            exit(EXIT_FAILURE);
+        }
     }
 }
 
@@ -70,8 +87,15 @@ void ClientFrontend::listenForMessages() {
             textBuffer->append("\n");
             Fl::unlock();
             Fl::awake();
-        } else if (bytesReceived <= 0) {
-            break; // Handle error or disconnect
+        } else if (bytesReceived == 0) {
+            // Server closed connection
+            break;
+        } else {
+            // No data received, or error occurred
+            if (errno != EWOULDBLOCK && errno != EAGAIN) {
+                break;  // An actual error occurred
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Sleep to prevent tight loop
         }
     }
 }
