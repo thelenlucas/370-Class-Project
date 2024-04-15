@@ -65,6 +65,8 @@ void ClientHandler::run() {
 
     // Cleanup on disconnect
     std::cout << "Client Handler: Stopping client handler" << std::endl;
+    // Let the other clients know this client has disconnected
+    server->broadcastMessage("Client disconnected");
     server->removeClient(this);
 }
 
