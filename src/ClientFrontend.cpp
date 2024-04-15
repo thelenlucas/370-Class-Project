@@ -104,7 +104,6 @@ void ClientFrontend::listenForMessages() {
         if (bytesReceived > 0) {
             buffer[bytesReceived] = '\0';
             Fl::lock();
-            textBuffer->append("Server: ");
             textBuffer->append(buffer);
             textBuffer->append("\n");
             Fl::unlock();
