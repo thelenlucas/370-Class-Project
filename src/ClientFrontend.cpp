@@ -1,0 +1,87 @@
+#include "ClientFrontend.h"
+#include <FL/Fl.H>
+#include <iostream>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <cstring>
+
+ClientFrontend::ClientFrontend(int port, const std::string& host) {
+    connectToServer(port, host);
+
+    window = new Fl_Window(640, 480, "Chat Client");
+    textDisplay = new Fl_Text_Display(20, 20, 600, 350);
+    textBuffer = new Fl_Text_Buffer();
+    textDisplay->buffer(textBuffer);
+    input = new Fl_Input(20, 380, 600, 25);
+    input->callback(send_message, this);
+
+    window->callback(window_callback, this);
+    window->end();
+}
+
+ClientFrontend::~ClientFrontend() {
+    closeConnection();
+    delete window;
+    delete textDisplay;
+    delete textBuffer;
+    delete input;
+}
+
+void ClientFrontend::run() {
+    window->show();
+    Fl::run();
+}
+
+void ClientFrontend::connectToServer(int port, const std::string& host) {
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        std::cerr << "Socket creation error" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(port);
+    if (inet_pton(AF_INET, host.c_str(), &serv_addr.sin_addr) <= 0) {
+        std::cerr << "Invalid address/ Address not supported" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+        std::cerr << "Connection Failed" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+}
+
+void ClientFrontend::send_message(Fl_Widget*, void* userdata) {
+    ClientFrontend* frontend = static_cast<ClientFrontend*>(userdata);
+    const char* text = frontend->input->value();
+    if (send(frontend->sock, text, strlen(text), 0) < 0) {
+        std::cerr << "Failed to send message" << std::endl;
+    }
+
+    frontend->input->value("");
+
+    char buffer[1024] = {0};
+    int bytesReceived = recv(frontend->sock, buffer, 1024, 0);
+    if (bytesReceived < 0) {
+        std::cerr << "Error in receiving response from server." << std::endl;
+    } else {
+        buffer[bytesReceived] = '\0';
+        frontend->textBuffer->append("Server: ");
+        frontend->textBuffer->append(buffer);
+        frontend->textBuffer->append("\n");
+    }
+}
+
+void ClientFrontend::window_callback(Fl_Widget *w, void* userdata) {
+    ClientFrontend* frontend = static_cast<ClientFrontend*>(userdata);
+    frontend->closeConnection();
+    w->hide();
+}
+
+void ClientFrontend::closeConnection() {
+    if (sock != 0) {
+        close(sock);
+        sock = 0;
+    }
+}
