@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <cstring>
 
-ClientFrontend::ClientFrontend(int port, const std::string& host) {
+ClientFrontend::ClientFrontend(int port, const std::string& host) : running(true) {
     connectToServer(port, host);
 
     window = new Fl_Window(640, 480, "Chat Client");
@@ -18,9 +18,15 @@ ClientFrontend::ClientFrontend(int port, const std::string& host) {
 
     window->callback(window_callback, this);
     window->end();
+
+    listenThread = std::thread(&ClientFrontend::listenForMessages, this);
 }
 
 ClientFrontend::~ClientFrontend() {
+    running = false;
+    if (listenThread.joinable()) {
+        listenThread.join();
+    }
     closeConnection();
     delete window;
     delete textDisplay;
@@ -52,29 +58,36 @@ void ClientFrontend::connectToServer(int port, const std::string& host) {
     }
 }
 
+void ClientFrontend::listenForMessages() {
+    while (running) {
+        char buffer[1024] = {0};
+        int bytesReceived = recv(sock, buffer, 1024, 0);
+        if (bytesReceived > 0) {
+            buffer[bytesReceived] = '\0';
+            Fl::lock();
+            textBuffer->append("Server: ");
+            textBuffer->append(buffer);
+            textBuffer->append("\n");
+            Fl::unlock();
+            Fl::awake();
+        } else if (bytesReceived <= 0) {
+            break; // Handle error or disconnect
+        }
+    }
+}
+
 void ClientFrontend::send_message(Fl_Widget*, void* userdata) {
     ClientFrontend* frontend = static_cast<ClientFrontend*>(userdata);
     const char* text = frontend->input->value();
     if (send(frontend->sock, text, strlen(text), 0) < 0) {
         std::cerr << "Failed to send message" << std::endl;
     }
-
     frontend->input->value("");
-
-    char buffer[1024] = {0};
-    int bytesReceived = recv(frontend->sock, buffer, 1024, 0);
-    if (bytesReceived < 0) {
-        std::cerr << "Error in receiving response from server." << std::endl;
-    } else {
-        buffer[bytesReceived] = '\0';
-        frontend->textBuffer->append("Server: ");
-        frontend->textBuffer->append(buffer);
-        frontend->textBuffer->append("\n");
-    }
 }
 
 void ClientFrontend::window_callback(Fl_Widget *w, void* userdata) {
     ClientFrontend* frontend = static_cast<ClientFrontend*>(userdata);
+    frontend->running = false;
     frontend->closeConnection();
     w->hide();
 }

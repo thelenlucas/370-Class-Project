@@ -7,6 +7,9 @@
 #include <FL/Fl_Input.H>
 #include <string>
 #include <arpa/inet.h>
+#include <string>
+#include <thread>
+#include <atomic>
 
 class ClientFrontend {
 public:
@@ -22,8 +25,11 @@ private:
     Fl_Input* input;
     int sock;
     struct sockaddr_in serv_addr;
+    std::thread listenThread;
+    std::atomic<bool> running;
 
     static void send_message(Fl_Widget*, void* userdata);
+    void listenForMessages();
     void connectToServer(int port, const std::string& host);
     void closeConnection();
     static void window_callback(Fl_Widget *w, void* userdata);
