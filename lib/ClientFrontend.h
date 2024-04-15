@@ -27,12 +27,16 @@ private:
     Fl_Button* loginButton;
 
     std::string username;  // Store the username
+    std::string serverAddress;  // Store the server address
 
     static void login_cb(Fl_Widget*, void* userdata);  // Callback for login button
+
     Fl_Window* window;
     Fl_Text_Display* textDisplay;
     Fl_Text_Buffer* textBuffer;
     Fl_Input* input;
+    Fl_Input* serverAddressInput;
+
     int sock;
     struct sockaddr_in serv_addr;
     std::thread listenThread;

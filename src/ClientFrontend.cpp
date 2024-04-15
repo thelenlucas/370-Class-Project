@@ -32,9 +32,11 @@ ClientFrontend::~ClientFrontend() {
 }
 
 void ClientFrontend::showLoginWindow() {
-    loginWindow = new Fl_Window(300, 120, "Login");
-    usernameInput = new Fl_Input(70, 30, 210, 30, "Username:");
-    loginButton = new Fl_Button(110, 80, 80, 30, "Login");
+    loginWindow = new Fl_Window(300, 170, "Login");
+    usernameInput = new Fl_Input(110, 30, 160, 30, "Username:");
+    serverAddressInput = new Fl_Input(110, 70, 160, 30, "Server Address:");
+    serverAddressInput->value("127.0.0.1");  // Default server address
+    loginButton = new Fl_Button(100, 120, 100, 30, "Login");
     loginButton->callback(login_cb, this);
 
     loginWindow->end();
@@ -44,7 +46,10 @@ void ClientFrontend::showLoginWindow() {
 void ClientFrontend::login_cb(Fl_Widget*, void* userdata) {
     ClientFrontend* frontend = static_cast<ClientFrontend*>(userdata);
     frontend->username = frontend->usernameInput->value();
-    frontend->connectToServer(8080, "127.0.0.1");  // Assuming these are not changing
+    frontend->serverAddress = frontend->serverAddressInput->value(); // Get server address from input
+
+    // Use the server address and port provided by user (default port 8080 if not specified)
+    frontend->connectToServer(8080, frontend->serverAddress);
     frontend->window->show();
     frontend->loginWindow->hide();
     frontend->running = true;
