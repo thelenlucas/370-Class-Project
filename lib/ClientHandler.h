@@ -22,13 +22,10 @@ public:
     void run();
     void stop();
     Client* getClient();
-    void erase();
 
 private:
     Client* client;
     Server* server;
     std::thread thread;
     std::atomic<bool> active;
-
-    void processMessages();
 };
