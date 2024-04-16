@@ -1,54 +1,47 @@
-@startuml Class Diagram
+@startuml Server Class Diagram
+
+class Client {
+    - int socket
+    - std::string username
+    + Client(int socket, const std::string& username)
+    + std::string receiveMessage(int &len)
+    + void sendMessage(const std::string& message)
+    - void sendResponse(const char* message)
+}
+
 
 class Server {
     - int serverSocket
-    - vector<ClientHandler*> clientHandlers
+    - std::vector<ClientHandler*> clientHandlers
     - int port
     - sockaddr_in addr
-    - mutex clientsMutex
-
+    - std::mutex clientsMutex
     + Server(int port)
     + ~Server()
     + void start()
-    + void acceptConnections()
-    + void broadcastMessage(string message)
-    + void run()
-    + void addClient(ClientHandler* handler)
+    + void broadcastMessage(const std::string& message)
     + void removeClient(ClientHandler* handler)
-
     - void setupAddress()
     - bool createSocket()
     - bool bindSocket()
     - void listenAndAccept()
-}
-
-class Client {
-    - int socket
-    - string username
-
-    + Client(int socket, string username)
-    + string receiveMessage()
-    + void sendMessage(string message)
-    - void sendResponse(const char* message)
+    - void addClient(ClientHandler* handler)
 }
 
 class ClientHandler {
     - Client* client
     - Server* server
-    - thread thread
-    - atomic<bool> active
-
-    + ClientHandler(Client* client, Server* server)
+    - std::thread thread
+    - std::atomic<bool> active
+    + explicit ClientHandler(Client* client, Server* server)
     + ~ClientHandler()
     + void start()
     + void run()
     + void stop()
     + Client* getClient()
-
-    - void processMessages()
 }
 
-Server "1" *-- "many" ClientHandler : manages
-ClientHandler "1" -- "1" Client : uses
+Client "1" -- "0..*" ClientHandler
+ClientHandler "1" -- "1" Server
 
 @enduml

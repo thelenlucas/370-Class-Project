@@ -1,0 +1,42 @@
+@startuml Client Diagram
+
+class ClientFrontend {
+    - Fl_Window* loginWindow
+    - Fl_Input* usernameInput
+    - Fl_Button* loginButton
+    - Fl_Window* window
+    - Fl_Text_Display* textDisplay
+    - Fl_Text_Buffer* textBuffer
+    - Fl_Input* input
+    - Fl_Input* serverAddressInput
+    - std::string username
+    - std::string serverAddress
+    - int sock
+    - static const int port = 8081
+    - struct sockaddr_in serv_addr
+    - std::thread listenThread
+    - std::atomic<bool> running
+    + ClientFrontend()
+    + ~ClientFrontend()
+    + void run()
+    + void showLoginWindow()
+    + static void login_cb(Fl_Widget*, void* userdata)
+    + static void send_message(Fl_Widget*, void* userdata)
+    + void listenForMessages()
+    + void connectToServer(int port, const std::string& host)
+    + void closeConnection()
+    + static void window_callback(Fl_Widget *w, void* userdata)
+}
+
+class Client {
+    - int socket
+    - std::string username
+    + Client(int socket, const std::string& username)
+    + std::string receiveMessage(int &len)
+    + void sendMessage(const std::string& message)
+    - void sendResponse(const char* message)
+}
+
+ClientFrontend --> Client : Uses
+
+@enduml

@@ -1,0 +1,19 @@
+@startuml Network
+
+cloud "Internet" {
+    node "Client 2\n[203.0.113.2]" 
+    node "Client 3\n[203.0.113.3]" 
+    node "Client 4\n[203.0.113.4]" 
+}
+
+node "Local Network" {
+    node "Server" {
+        component [Server Application] as App
+    }
+    node "Client 1\n[192.168.1.10]" as Client1
+}
+
+Client1 -down-> App : connects directly
+Internet -down-> App : connects via Internet
+
+@enduml
