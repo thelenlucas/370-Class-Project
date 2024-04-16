@@ -35,7 +35,7 @@ void ClientFrontend::showLoginWindow() {
     loginWindow = new Fl_Window(300, 170, "Login");
     usernameInput = new Fl_Input(110, 30, 160, 30, "Username:");
     serverAddressInput = new Fl_Input(110, 70, 160, 30, "Server Address:");
-    serverAddressInput->value("127.0.0.1");  // Default server address
+    serverAddressInput->value("136.53.59.21");  // Default server address
     loginButton = new Fl_Button(100, 120, 100, 30, "Login");
     loginButton->callback(login_cb, this);
 
