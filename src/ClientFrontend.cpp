@@ -95,6 +95,13 @@ void ClientFrontend::connectToServer(int port, const std::string& host) {
             exit(EXIT_FAILURE);
         }
     }
+
+    // Send a message to the server to identify the client
+    std::string command = ".join " + username;
+    if (send(sock, command.c_str(), command.length(), 0) < 0) {
+        std::cerr << "Failed to send join message" << std::endl;
+        exit(EXIT_FAILURE);
+    }
 }
 
 void ClientFrontend::listenForMessages() {
@@ -138,6 +145,12 @@ void ClientFrontend::window_callback(Fl_Widget *w, void* userdata) {
 }
 
 void ClientFrontend::closeConnection() {
+    // Send .exit message to server
+    std::string command = ".exit " + username;
+    if (send(sock, command.c_str(), command.length(), 0) < 0) {
+        std::cerr << "Failed to send exit message" << std::endl;
+    }
+
     if (sock != 0) {
         close(sock);
         sock = 0;

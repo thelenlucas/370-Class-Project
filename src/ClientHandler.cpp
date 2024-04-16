@@ -47,7 +47,28 @@ void ClientHandler::run() {
             
             if (receivedLength > 0) {
                 std::cout << "Client Handler: Message received: " << message << std::endl;
-                // Broadcast the message to all clients
+                // Command messages start with a .
+                if (message[0] == '.') {
+                    // Command message
+                    
+                    // Exit command is ".exit username"
+                    if (message.substr(0, 5) == ".exit") {
+                        // Exit command, let other clients know this client is disconnecting
+                        std::string username = message.substr(6);
+                        server->broadcastMessage("Server: " + username + " disconnected");
+                        continue;
+                    }
+
+                    // Join command is ".join username"
+                    if (message.substr(0, 5) == ".join") {
+                        // Join command, let other clients know this client is connecting
+                        std::string username = message.substr(6);
+                        server->broadcastMessage("Server: " + username + " connected");
+                        continue;
+                    }
+                }
+                
+                // Otherwise, broadcast the message to all clients
                 server->broadcastMessage(message);
             } else if (receivedLength == 0) {
                 std::cout << "Client Handler: Client disconnected" << std::endl;
@@ -66,7 +87,6 @@ void ClientHandler::run() {
     // Cleanup on disconnect
     std::cout << "Client Handler: Stopping client handler" << std::endl;
     // Let the other clients know this client has disconnected
-    server->broadcastMessage("Client disconnected");
     server->removeClient(this);
 }
 
