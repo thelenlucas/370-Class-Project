@@ -98,9 +98,8 @@ void ClientFrontend::connectToServer(int port, const std::string& host) {
 
     // Send a message to the server to identify the client
     std::string command = ".join " + username;
-    if (send(sock, command.c_str(), command.length(), 0) < 0) {
-        std::cerr << "Failed to send join message" << std::endl;
-        exit(EXIT_FAILURE);
+    while (send(sock, command.c_str(), command.length(), 0) < 0) {
+        
     }
 }
 
