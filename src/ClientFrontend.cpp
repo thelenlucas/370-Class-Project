@@ -14,6 +14,10 @@ ClientFrontend::ClientFrontend() : running(false) {  // Delay running
     input = new Fl_Input(20, 380, 600, 25);
     input->callback(send_message, this);
 
+    // Make windows resizable
+    window->resizable(textDisplay);
+    window->callback(window_callback, this);
+
     window->end();  // Setup main chat window but don't show it yet
 
     showLoginWindow();  // First, show the login window
